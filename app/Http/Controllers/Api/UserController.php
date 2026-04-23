@@ -6,9 +6,21 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use OpenApi\Attributes as OA;
 
 class UserController extends Controller
 {
+    #[OA\Get(
+        path: '/api/users',
+        summary: 'Lista de usuarios',
+        tags: ['Usuarios'],
+        security: [['sanctum' => []]],
+        responses: [
+            new OA\Response(response: 200, description: 'OK'),
+            new OA\Response(response: 401, description: 'No autenticado'),
+            new OA\Response(response: 403, description: 'No autorizado')
+        ]
+    )]
     public function index()
     {
         $users = User::with('role')->orderByDesc('id')->get();
@@ -20,6 +32,30 @@ class UserController extends Controller
         ]);
     }
 
+    #[OA\Post(
+        path: '/api/users',
+        summary: 'Crear usuario',
+        tags: ['Usuarios'],
+        security: [['sanctum' => []]],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ['name', 'email', 'password', 'rol_id'],
+                properties: [
+                    new OA\Property(property: 'name', type: 'string', example: 'Admin'),
+                    new OA\Property(property: 'email', type: 'string', format: 'email', example: 'admin@admin.com'),
+                    new OA\Property(property: 'password', type: 'string', example: 'password'),
+                    new OA\Property(property: 'rol_id', type: 'integer', example: 1)
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(response: 201, description: 'Usuario creado'),
+            new OA\Response(response: 401, description: 'No autenticado'),
+            new OA\Response(response: 403, description: 'No autorizado'),
+            new OA\Response(response: 422, description: 'Datos inválidos')
+        ]
+    )]
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -39,6 +75,21 @@ class UserController extends Controller
         ], 201);
     }
 
+    #[OA\Get(
+        path: '/api/users/{id}',
+        summary: 'Detalle de usuario',
+        tags: ['Usuarios'],
+        security: [['sanctum' => []]],
+        parameters: [
+            new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'OK'),
+            new OA\Response(response: 401, description: 'No autenticado'),
+            new OA\Response(response: 403, description: 'No autorizado'),
+            new OA\Response(response: 404, description: 'No encontrado')
+        ]
+    )]
     public function show(string $id)
     {
         $user = User::with('role')->find($id);
@@ -57,6 +108,34 @@ class UserController extends Controller
         ]);
     }
 
+    #[OA\Put(
+        path: '/api/users/{id}',
+        summary: 'Actualizar usuario',
+        tags: ['Usuarios'],
+        security: [['sanctum' => []]],
+        parameters: [
+            new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))
+        ],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ['name', 'email', 'rol_id'],
+                properties: [
+                    new OA\Property(property: 'name', type: 'string', example: 'Admin'),
+                    new OA\Property(property: 'email', type: 'string', format: 'email', example: 'admin@admin.com'),
+                    new OA\Property(property: 'rol_id', type: 'integer', example: 1),
+                    new OA\Property(property: 'password', type: 'string', example: 'password')
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(response: 200, description: 'Usuario actualizado'),
+            new OA\Response(response: 401, description: 'No autenticado'),
+            new OA\Response(response: 403, description: 'No autorizado'),
+            new OA\Response(response: 404, description: 'No encontrado'),
+            new OA\Response(response: 422, description: 'Datos inválidos')
+        ]
+    )]
     public function update(Request $request, string $id)
     {
         $user = User::find($id);
@@ -94,6 +173,21 @@ class UserController extends Controller
         ]);
     }
 
+    #[OA\Delete(
+        path: '/api/users/{id}',
+        summary: 'Eliminar usuario',
+        tags: ['Usuarios'],
+        security: [['sanctum' => []]],
+        parameters: [
+            new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Usuario eliminado'),
+            new OA\Response(response: 401, description: 'No autenticado'),
+            new OA\Response(response: 403, description: 'No autorizado'),
+            new OA\Response(response: 404, description: 'No encontrado')
+        ]
+    )]
     public function destroy(string $id)
     {
         $user = User::find($id);
