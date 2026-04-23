@@ -2,6 +2,8 @@
 
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
+use Illuminate\Auth\AuthenticationException;
+use Illuminate\Http\Request;
 use Illuminate\Foundation\Configuration\Middleware;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -13,9 +15,22 @@ return Application::configure(basePath: dirname(__DIR__))
 )
     ->withMiddleware(function ($middleware) {
     $middleware->alias([
+        'auth' => \App\Http\Middleware\Authenticate::class,
         'role' => \App\Http\Middleware\RoleMiddleware::class,
     ]);
 })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->render(function (AuthenticationException $e, Request $request) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No autenticado'
+                ], 401);
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => 'No autenticado'
+            ], 401);
+        });
     })->create();
