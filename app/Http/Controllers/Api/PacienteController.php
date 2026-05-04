@@ -41,8 +41,10 @@ class PacienteController extends Controller
             content: new OA\JsonContent(
                 required: ['nombre', 'apellido', 'ci', 'seguro', 'estado'],
                 properties: [
+                    new OA\Property(property: 'user_id', type: 'integer', example: 2, nullable: true),
                     new OA\Property(property: 'nombre', type: 'string', example: 'Juan'),
-                    new OA\Property(property: 'apellido', type: 'string', example: 'Pérez'),
+                    new OA\Property(property: 'apellido', type: 'string', example: 'García'),
+                    new OA\Property(property: 'segundo_apellido', type: 'string', example: 'López'),
                     new OA\Property(property: 'ci', type: 'string', example: '1234567'),
                     new OA\Property(property: 'fecha_nacimiento', type: 'string', format: 'date', example: '1990-01-01'),
                     new OA\Property(property: 'telefono', type: 'string', example: '70000000'),
@@ -61,14 +63,16 @@ class PacienteController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'nombre' => 'required|string|max:255',
-            'apellido' => 'required|string|max:255',
-            'ci' => 'required|string|max:255|unique:pacientes,ci',
+            'user_id'          => 'nullable|exists:users,id',
+            'nombre'           => 'required|string|max:255',
+            'apellido'         => 'required|string|max:255',
+            'segundo_apellido' => 'nullable|string|max:255',
+            'ci'               => 'required|string|max:255|unique:pacientes,ci',
             'fecha_nacimiento' => 'nullable|date',
-            'telefono' => 'nullable|string|max:255',
-            'direccion' => 'nullable|string|max:255',
-            'seguro' => 'required|boolean',
-            'estado' => 'required|string|max:255',
+            'telefono'         => 'nullable|string|max:255',
+            'direccion'        => 'nullable|string|max:255',
+            'seguro'           => 'required|boolean',
+            'estado'           => 'required|string|max:255',
         ]);
 
         $paciente = Paciente::create($validated);
@@ -124,8 +128,10 @@ class PacienteController extends Controller
             content: new OA\JsonContent(
                 required: ['nombre', 'apellido', 'ci', 'seguro', 'estado'],
                 properties: [
+                    new OA\Property(property: 'user_id', type: 'integer', example: 2, nullable: true),
                     new OA\Property(property: 'nombre', type: 'string', example: 'Juan'),
-                    new OA\Property(property: 'apellido', type: 'string', example: 'Pérez'),
+                    new OA\Property(property: 'apellido', type: 'string', example: 'García'),
+                    new OA\Property(property: 'segundo_apellido', type: 'string', example: 'López'),
                     new OA\Property(property: 'ci', type: 'string', example: '1234567'),
                     new OA\Property(property: 'fecha_nacimiento', type: 'string', format: 'date', example: '1990-01-01'),
                     new OA\Property(property: 'telefono', type: 'string', example: '70000000'),
@@ -153,19 +159,21 @@ class PacienteController extends Controller
         }
 
         $validated = $request->validate([
-            'nombre' => 'required|string|max:255',
-            'apellido' => 'required|string|max:255',
-            'ci' => [
+            'user_id'          => 'nullable|exists:users,id',
+            'nombre'           => 'required|string|max:255',
+            'apellido'         => 'required|string|max:255',
+            'segundo_apellido' => 'nullable|string|max:255',
+            'ci'               => [
                 'required',
                 'string',
                 'max:255',
                 Rule::unique('pacientes', 'ci')->ignore($paciente->id),
             ],
             'fecha_nacimiento' => 'nullable|date',
-            'telefono' => 'nullable|string|max:255',
-            'direccion' => 'nullable|string|max:255',
-            'seguro' => 'required|boolean',
-            'estado' => 'required|string|max:255',
+            'telefono'         => 'nullable|string|max:255',
+            'direccion'        => 'nullable|string|max:255',
+            'seguro'           => 'required|boolean',
+            'estado'           => 'required|string|max:255',
         ]);
 
         $paciente->update($validated);
