@@ -39,4 +39,17 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Role::class, 'rol_id');
     }
+
+    // Relación: un usuario puede estar vinculado a un paciente
+    public function paciente()
+    {
+        return $this->hasOne(Paciente::class);
+    }
+
+    protected static function booted(): void
+    {
+        static::deleting(function (User $user) {
+            $user->tokens()->delete();
+        });
+    }
 }

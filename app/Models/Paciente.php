@@ -12,8 +12,10 @@ class Paciente extends Model
     protected $table = 'pacientes';
 
     protected $fillable = [
+        'user_id',
         'nombre',
         'apellido',
+        'segundo_apellido',
         'ci',
         'fecha_nacimiento',
         'telefono',
@@ -21,6 +23,22 @@ class Paciente extends Model
         'seguro',
         'estado'
     ];
+
+    protected static function booted(): void
+    {
+        static::deleting(function (Paciente $paciente) {
+            if ($paciente->user_id && $paciente->user) {
+                $paciente->user->tokens()->delete();
+                $paciente->user->delete();
+            }
+        });
+    }
+
+    // Relación: un paciente pertenece a un usuario
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
     // Relación: un paciente tiene muchas citas
     public function citas()

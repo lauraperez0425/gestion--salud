@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 use OpenApi\Attributes as OA;
 
 class AuthController extends Controller
@@ -117,6 +119,71 @@ class AuthController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Sesión cerrada correctamente'
+        ]);
+    }
+
+    #[OA\Post(
+        path: '/api/change-password',
+        summary: 'Cambiar contraseña del usuario autenticado',
+        tags: ['Auth'],
+        security: [['sanctum' => []]],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ['current_password', 'new_password', 'new_password_confirmation'],
+                properties: [
+                    new OA\Property(property: 'current_password', type: 'string', example: 'password'),
+                    new OA\Property(property: 'new_password', type: 'string', example: 'nuevaPassword123'),
+                    new OA\Property(property: 'new_password_confirmation', type: 'string', example: 'nuevaPassword123')
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(response: 200, description: 'Contraseña actualizada'),
+            new OA\Response(response: 401, description: 'No autenticado o contraseña actual incorrecta'),
+            new OA\Response(response: 422, description: 'Datos inválidos')
+        ]
+    )]
+    public function changePassword(Request $request)
+    {
+        $user = $request->user();
+
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Usuario no autenticado'
+            ], 401);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'current_password' => 'required|string',
+            'new_password' => 'required|string|min:8|confirmed|different:current_password',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Datos inválidos',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        $validated = $validator->validated();
+
+        if (!Hash::check($validated['current_password'], $user->password)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'La contraseña actual es incorrecta'
+            ], 401);
+        }
+
+        $user->update([
+            'password' => $validated['new_password']
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Contraseña actualizada correctamente'
         ]);
     }
 }

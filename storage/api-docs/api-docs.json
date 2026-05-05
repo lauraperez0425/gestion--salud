@@ -101,6 +101,60 @@
                 ]
             }
         },
+        "/api/change-password": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Cambiar contraseña del usuario autenticado",
+                "operationId": "88e8bff0f686a99070f87cdf1bac01e1",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "current_password",
+                                    "new_password",
+                                    "new_password_confirmation"
+                                ],
+                                "properties": {
+                                    "current_password": {
+                                        "type": "string",
+                                        "example": "password"
+                                    },
+                                    "new_password": {
+                                        "type": "string",
+                                        "example": "nuevaPassword123"
+                                    },
+                                    "new_password_confirmation": {
+                                        "type": "string",
+                                        "example": "nuevaPassword123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Contraseña actualizada"
+                    },
+                    "401": {
+                        "description": "No autenticado o contraseña actual incorrecta"
+                    },
+                    "422": {
+                        "description": "Datos inválidos"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/api/pacientes": {
             "get": {
                 "tags": [
@@ -141,13 +195,22 @@
                                     "estado"
                                 ],
                                 "properties": {
+                                    "user_id": {
+                                        "type": "integer",
+                                        "example": 2,
+                                        "nullable": true
+                                    },
                                     "nombre": {
                                         "type": "string",
                                         "example": "Juan"
                                     },
                                     "apellido": {
                                         "type": "string",
-                                        "example": "Pérez"
+                                        "example": "García"
+                                    },
+                                    "segundo_apellido": {
+                                        "type": "string",
+                                        "example": "López"
                                     },
                                     "ci": {
                                         "type": "string",
@@ -258,13 +321,22 @@
                                     "estado"
                                 ],
                                 "properties": {
+                                    "user_id": {
+                                        "type": "integer",
+                                        "example": 2,
+                                        "nullable": true
+                                    },
                                     "nombre": {
                                         "type": "string",
                                         "example": "Juan"
                                     },
                                     "apellido": {
                                         "type": "string",
-                                        "example": "Pérez"
+                                        "example": "García"
+                                    },
+                                    "segundo_apellido": {
+                                        "type": "string",
+                                        "example": "López"
                                     },
                                     "ci": {
                                         "type": "string",
@@ -358,6 +430,191 @@
                     },
                     "401": {
                         "description": "No autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Roles"
+                ],
+                "summary": "Crear rol",
+                "operationId": "341b8b162b61267c7bd187500aea5bc4",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "nombre"
+                                ],
+                                "properties": {
+                                    "nombre": {
+                                        "type": "string",
+                                        "example": "Medico"
+                                    },
+                                    "descripcion": {
+                                        "type": "string",
+                                        "example": "Rol para médicos"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Rol creado"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "403": {
+                        "description": "No autorizado"
+                    },
+                    "422": {
+                        "description": "Datos inválidos"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/roles/{id}": {
+            "get": {
+                "tags": [
+                    "Roles"
+                ],
+                "summary": "Detalle de rol",
+                "operationId": "15c404caf238f1861c81f68205d328e5",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "403": {
+                        "description": "No autorizado"
+                    },
+                    "404": {
+                        "description": "No encontrado"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Roles"
+                ],
+                "summary": "Actualizar rol",
+                "operationId": "c73ab816ae8fb7c34a995d37ba577082",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "nombre"
+                                ],
+                                "properties": {
+                                    "nombre": {
+                                        "type": "string",
+                                        "example": "Medico"
+                                    },
+                                    "descripcion": {
+                                        "type": "string",
+                                        "example": "Rol para médicos"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Rol actualizado"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "403": {
+                        "description": "No autorizado"
+                    },
+                    "404": {
+                        "description": "No encontrado"
+                    },
+                    "422": {
+                        "description": "Datos inválidos"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Roles"
+                ],
+                "summary": "Eliminar rol",
+                "operationId": "ffa6ef115d86b00cc6c54a6210019f9c",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Rol eliminado"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "403": {
+                        "description": "No autorizado"
+                    },
+                    "404": {
+                        "description": "No encontrado"
                     }
                 },
                 "security": [
