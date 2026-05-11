@@ -155,6 +155,253 @@
                 ]
             }
         },
+        "/api/citas": {
+            "get": {
+                "tags": [
+                    "Citas"
+                ],
+                "summary": "Lista de citas",
+                "operationId": "f72ab7ec2fefc122a15f6144429b447e",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Citas"
+                ],
+                "summary": "Agendar cita",
+                "operationId": "c4ab038918e8ec0821701c36d4e04b3e",
+                "requestBody": {
+                    "description": "Datos para agendar una cita",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "paciente_id",
+                                    "medico_id",
+                                    "fecha",
+                                    "hora"
+                                ],
+                                "properties": {
+                                    "paciente_id": {
+                                        "description": "ID del paciente",
+                                        "type": "integer"
+                                    },
+                                    "medico_id": {
+                                        "description": "ID del médico",
+                                        "type": "integer"
+                                    },
+                                    "fecha": {
+                                        "description": "Fecha de la cita (Y-m-d)",
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "hora": {
+                                        "description": "Hora de la cita (H:i)",
+                                        "type": "string",
+                                        "format": "time"
+                                    },
+                                    "estado": {
+                                        "description": "Estado de la cita (opcional)",
+                                        "type": "string",
+                                        "enum": [
+                                            "pendiente",
+                                            "confirmada",
+                                            "cancelada",
+                                            "completada"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Cita creada"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "409": {
+                        "description": "Horario no disponible"
+                    },
+                    "422": {
+                        "description": "Datos invalidos"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/citas/{id}": {
+            "get": {
+                "tags": [
+                    "Citas"
+                ],
+                "summary": "Detalle de cita",
+                "operationId": "b1d212f71c8c168d16a779cebd74eb8f",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "404": {
+                        "description": "No encontrado"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Citas"
+                ],
+                "summary": "Reprogramar o actualizar cita",
+                "operationId": "cd94afa217830e0db15566c9a7daaac0",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Cita actualizada"
+                    },
+                    "404": {
+                        "description": "No encontrado"
+                    },
+                    "409": {
+                        "description": "Horario no disponible"
+                    },
+                    "422": {
+                        "description": "Datos invalidos"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Citas"
+                ],
+                "summary": "Cancelar cita",
+                "operationId": "24f980710de8c15777519be7ad096c21",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Cita cancelada"
+                    },
+                    "404": {
+                        "description": "No encontrado"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/citas/disponibilidad": {
+            "get": {
+                "tags": [
+                    "Citas"
+                ],
+                "summary": "Horarios disponibles por medico y fecha",
+                "operationId": "0a8d1de9d29921c74e86fbffdd075365",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Datos invalidos"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/medicos/{medico_id}/citas": {
+            "get": {
+                "tags": [
+                    "Citas"
+                ],
+                "summary": "Citas de un médico específico",
+                "operationId": "dbeb591e579c38ac414d9cfd414e17a2",
+                "parameters": [
+                    {
+                        "name": "medico_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "404": {
+                        "description": "Médico no encontrado"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/api/pacientes": {
             "get": {
                 "tags": [
@@ -710,6 +957,28 @@
                 ]
             }
         },
+        "/api/medicos": {
+            "get": {
+                "tags": [
+                    "Usuarios"
+                ],
+                "summary": "Lista de medicos",
+                "operationId": "d9a41cb7ae0ea3bdaac27af3b30dea07",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/api/users/{id}": {
             "get": {
                 "tags": [
@@ -872,6 +1141,10 @@
         {
             "name": "Auth",
             "description": "Auth"
+        },
+        {
+            "name": "Citas",
+            "description": "Citas"
         },
         {
             "name": "Pacientes",

@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\CitaController;
 use App\Http\Controllers\Api\PacienteController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\UserController;
@@ -14,8 +15,22 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/change-password', [AuthController::class, 'changePassword']);
 
     Route::get('/roles', [RoleController::class, 'index']);
+    Route::get('/medicos', [UserController::class, 'medicos']);
 
     Route::apiResource('pacientes', PacienteController::class);
+    Route::get('/citas/disponibilidad', [CitaController::class, 'disponibilidad']);
+    Route::get('/medicos/{medico_id}/citas', [CitaController::class, 'citasPorMedico']);
+    
+    // Solo médico y administrador pueden listar TODAS las citas
+    Route::middleware('role:Medico,Administrador')->group(function () {
+        Route::get('/citas', [CitaController::class, 'index']);
+    });
+    
+    // Otros usuarios autenticados pueden crear, ver, actualizar, cancelar citas
+    Route::post('/citas', [CitaController::class, 'store']);
+    Route::get('/citas/{id}', [CitaController::class, 'show']);
+    Route::put('/citas/{id}', [CitaController::class, 'update']);
+    Route::delete('/citas/{id}', [CitaController::class, 'destroy']);
 
     Route::middleware('role:Administrador')->group(function () {
         Route::apiResource('users', UserController::class);

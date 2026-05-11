@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
 use OpenApi\Attributes as OA;
 
 class UserController extends Controller
@@ -29,6 +30,34 @@ class UserController extends Controller
             'success' => true,
             'message' => 'Lista de usuarios',
             'data' => $users
+        ]);
+    }
+
+    #[OA\Get(
+        path: '/api/medicos',
+        summary: 'Lista de medicos',
+        tags: ['Usuarios'],
+        security: [['sanctum' => []]],
+        responses: [
+            new OA\Response(response: 200, description: 'OK'),
+            new OA\Response(response: 401, description: 'No autenticado')
+        ]
+    )]
+    public function medicos()
+    {
+        $rolesMedico = ['medico', 'medico/a', 'medico(a)', 'médico', 'doctor'];
+
+        $medicos = User::with('role')
+            ->whereHas('role', function ($query) use ($rolesMedico) {
+                $query->whereIn(DB::raw('LOWER(TRIM(nombre))'), $rolesMedico);
+            })
+            ->orderBy('name')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Lista de medicos',
+            'data' => $medicos,
         ]);
     }
 
