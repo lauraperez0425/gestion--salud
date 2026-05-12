@@ -20,6 +20,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('pacientes', PacienteController::class);
     Route::get('/citas/disponibilidad', [CitaController::class, 'disponibilidad']);
     Route::get('/medicos/{medico_id}/citas', [CitaController::class, 'citasPorMedico']);
+    Route::get('/pacientes/{paciente_id}/citas', [CitaController::class, 'citasPorPaciente']);
     
     // Solo médico y administrador pueden listar TODAS las citas
     Route::middleware('role:Medico,Administrador')->group(function () {

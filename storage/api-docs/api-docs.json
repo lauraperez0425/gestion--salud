@@ -297,6 +297,47 @@
                         }
                     }
                 ],
+                "requestBody": {
+                    "description": "Datos para actualizar una cita (todos los campos son opcionales)",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "paciente_id": {
+                                        "description": "ID del paciente (opcional)",
+                                        "type": "integer"
+                                    },
+                                    "medico_id": {
+                                        "description": "ID del médico (opcional)",
+                                        "type": "integer"
+                                    },
+                                    "fecha": {
+                                        "description": "Fecha de la cita Y-m-d (opcional)",
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "hora": {
+                                        "description": "Hora de la cita H:i (opcional)",
+                                        "type": "string",
+                                        "format": "time"
+                                    },
+                                    "estado": {
+                                        "description": "Estado de la cita (opcional)",
+                                        "type": "string",
+                                        "enum": [
+                                            "pendiente",
+                                            "confirmada",
+                                            "cancelada",
+                                            "completada"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
                 "responses": {
                     "200": {
                         "description": "Cita actualizada"
@@ -393,6 +434,38 @@
                     },
                     "404": {
                         "description": "Médico no encontrado"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/pacientes/{paciente_id}/citas": {
+            "get": {
+                "tags": [
+                    "Citas"
+                ],
+                "summary": "Citas de un paciente específico",
+                "operationId": "329c1fdf30ef415631853b3743b91808",
+                "parameters": [
+                    {
+                        "name": "paciente_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "404": {
+                        "description": "Paciente no encontrado"
                     }
                 },
                 "security": [

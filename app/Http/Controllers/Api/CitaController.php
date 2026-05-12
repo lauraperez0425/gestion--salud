@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Cita;
+use App\Models\Paciente;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -162,6 +163,20 @@ class CitaController extends Controller
         parameters: [
             new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))
         ],
+        requestBody: new OA\RequestBody(
+            description: 'Datos para actualizar una cita (todos los campos son opcionales)',
+            required: true,
+            content: new OA\JsonContent(
+                type: 'object',
+                properties: [
+                    new OA\Property(property: 'paciente_id', type: 'integer', description: 'ID del paciente (opcional)'),
+                    new OA\Property(property: 'medico_id', type: 'integer', description: 'ID del médico (opcional)'),
+                    new OA\Property(property: 'fecha', type: 'string', format: 'date', description: 'Fecha de la cita Y-m-d (opcional)'),
+                    new OA\Property(property: 'hora', type: 'string', format: 'time', description: 'Hora de la cita H:i (opcional)'),
+                    new OA\Property(property: 'estado', type: 'string', enum: ['pendiente', 'confirmada', 'cancelada', 'completada'], description: 'Estado de la cita (opcional)'),
+                ]
+            )
+        ),
         responses: [
             new OA\Response(response: 200, description: 'Cita actualizada'),
             new OA\Response(response: 404, description: 'No encontrado'),
@@ -181,26 +196,37 @@ class CitaController extends Controller
         }
 
         $validated = $request->validate([
-            'paciente_id' => 'required|exists:pacientes,id',
-            'medico_id' => 'required|exists:users,id',
-            'fecha' => 'required|date_format:Y-m-d|after_or_equal:today',
-            'hora' => 'required|date_format:H:i',
-            'estado' => 'required|in:pendiente,confirmada,cancelada,completada',
+            'paciente_id' => 'sometimes|required|exists:pacientes,id',
+            'medico_id' => 'sometimes|required|exists:users,id',
+            'fecha' => 'sometimes|required|date_format:Y-m-d|after_or_equal:today',
+            'hora' => 'sometimes|required|date_format:H:i',
+            'estado' => 'sometimes|required|in:pendiente,confirmada,cancelada,completada',
         ]);
 
-        $medico = User::with('role')->find($validated['medico_id']);
-        if (!$this->esMedico($medico)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'El usuario seleccionado no tiene rol de medico',
-            ], 422);
+        // Validar que el médico sea válido si se intenta cambiar
+        if (isset($validated['medico_id'])) {
+            $medico = User::with('role')->find($validated['medico_id']);
+            if (!$this->esMedico($medico)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'El usuario seleccionado no tiene rol de medico',
+                ], 422);
+            }
         }
 
-        if ($this->hayConflicto($cita->id, $validated['medico_id'], $validated['paciente_id'], $validated['fecha'], $validated['hora'])) {
-            return response()->json([
-                'success' => false,
-                'message' => 'El horario solicitado no esta disponible',
-            ], 409);
+        // Validar conflicto de horario si se intenta cambiar fecha, hora, médico o paciente
+        if (isset($validated['medico_id']) || isset($validated['paciente_id']) || isset($validated['fecha']) || isset($validated['hora'])) {
+            $medicoId = $validated['medico_id'] ?? $cita->medico_id;
+            $pacienteId = $validated['paciente_id'] ?? $cita->paciente_id;
+            $fecha = $validated['fecha'] ?? $cita->fecha->format('Y-m-d');
+            $hora = $validated['hora'] ?? $cita->hora->format('H:i');
+
+            if ($this->hayConflicto($cita->id, $medicoId, $pacienteId, $fecha, $hora)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'El horario solicitado no esta disponible',
+                ], 409);
+            }
         }
 
         $cita->update($validated);
@@ -341,6 +367,46 @@ class CitaController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Citas del médico',
+            'data' => $citas,
+        ]);
+    }
+
+    #[OA\Get(
+        path: '/api/pacientes/{paciente_id}/citas',
+        summary: 'Citas de un paciente específico',
+        tags: ['Citas'],
+        security: [['sanctum' => []]],
+        parameters: [
+            new OA\Parameter(name: 'paciente_id', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'OK'),
+            new OA\Response(response: 404, description: 'Paciente no encontrado')
+        ]
+    )]
+    public function citasPorPaciente(string $paciente_id)
+    {
+        $paciente = Paciente::find($paciente_id);
+
+        if (!$paciente) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Paciente no encontrado',
+            ], 404);
+        }
+
+        $citas = Cita::with([
+            'paciente:id,nombre,apellido,segundo_apellido,ci',
+            'medico:id,name,email',
+        ])
+            ->where('paciente_id', $paciente_id)
+            ->orderBy('fecha')
+            ->orderBy('hora')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Citas del paciente',
             'data' => $citas,
         ]);
     }
