@@ -20,6 +20,12 @@ class Paciente extends Model
         'fecha_nacimiento',
         'telefono',
         'direccion',
+        'estatura',
+        'peso',
+        'tipo_sangre_id',
+        'presion_arterial',
+        'temperatura',
+        'oxigeno_sangre',
         'seguro',
         'estado'
     ];
@@ -56,5 +62,11 @@ class Paciente extends Model
     public function vigencias()
     {
         return $this->hasMany(VigenciaDerecho::class);
+    }
+
+    // Relación: un paciente pertenece a un tipo de sangre
+    public function tipoSangre()
+    {
+        return $this->belongsTo(TipoSangre::class, 'tipo_sangre_id');
     }
 }

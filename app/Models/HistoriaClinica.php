@@ -13,6 +13,13 @@ class HistoriaClinica extends Model
 
     protected $fillable = [
         'paciente_id',
+        'motivo_consulta',
+        'enfermedad_actual',
+        'peso',
+        'talla',
+        'presion_arterial',
+        'saturacion',
+        'temperatura',
         'diagnostico',
         'tratamiento',
         'observaciones',

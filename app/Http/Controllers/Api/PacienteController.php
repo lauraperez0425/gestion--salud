@@ -22,7 +22,7 @@ class PacienteController extends Controller
     )]
     public function index()
     {
-        $pacientes = Paciente::orderByDesc('id')->get();
+        $pacientes = Paciente::with('tipoSangre:id,nombre')->orderByDesc('id')->get();
 
         return response()->json([
             'success' => true,
@@ -49,6 +49,12 @@ class PacienteController extends Controller
                     new OA\Property(property: 'fecha_nacimiento', type: 'string', format: 'date', example: '1990-01-01'),
                     new OA\Property(property: 'telefono', type: 'string', example: '70000000'),
                     new OA\Property(property: 'direccion', type: 'string', example: 'Av. Principal 123'),
+                    new OA\Property(property: 'estatura', type: 'number', format: 'float', example: 1.68, nullable: true),
+                    new OA\Property(property: 'peso', type: 'number', format: 'float', example: 65.4, nullable: true),
+                    new OA\Property(property: 'tipo_sangre_id', type: 'integer', example: 1, nullable: true),
+                    new OA\Property(property: 'presion_arterial', type: 'string', example: '120/80', nullable: true),
+                    new OA\Property(property: 'temperatura', type: 'number', format: 'float', example: 36.6, nullable: true),
+                    new OA\Property(property: 'oxigeno_sangre', type: 'integer', example: 98, nullable: true),
                     new OA\Property(property: 'seguro', type: 'boolean', example: true),
                     new OA\Property(property: 'estado', type: 'string', example: 'Activo')
                 ]
@@ -71,11 +77,18 @@ class PacienteController extends Controller
             'fecha_nacimiento' => 'nullable|date',
             'telefono'         => 'nullable|string|max:255',
             'direccion'        => 'nullable|string|max:255',
+            'estatura'         => 'nullable|numeric|min:0|max:3',
+            'peso'             => 'nullable|numeric|min:0|max:999.99',
+            'tipo_sangre_id'   => 'nullable|exists:tipos_sangre,id',
+            'presion_arterial' => 'nullable|string|max:20',
+            'temperatura'      => 'nullable|numeric|min:30|max:45',
+            'oxigeno_sangre'   => 'nullable|integer|min:0|max:100',
             'seguro'           => 'required|boolean',
             'estado'           => 'required|string|max:255',
         ]);
 
         $paciente = Paciente::create($validated);
+        $paciente->load('tipoSangre:id,nombre');
 
         return response()->json([
             'success' => true,
@@ -99,7 +112,7 @@ class PacienteController extends Controller
     )]
     public function show(string $id)
     {
-        $paciente = Paciente::find($id);
+        $paciente = Paciente::with('tipoSangre:id,nombre')->find($id);
 
         if (!$paciente) {
             return response()->json([
@@ -136,6 +149,12 @@ class PacienteController extends Controller
                     new OA\Property(property: 'fecha_nacimiento', type: 'string', format: 'date', example: '1990-01-01'),
                     new OA\Property(property: 'telefono', type: 'string', example: '70000000'),
                     new OA\Property(property: 'direccion', type: 'string', example: 'Av. Principal 123'),
+                    new OA\Property(property: 'estatura', type: 'number', format: 'float', example: 1.68, nullable: true),
+                    new OA\Property(property: 'peso', type: 'number', format: 'float', example: 65.4, nullable: true),
+                    new OA\Property(property: 'tipo_sangre_id', type: 'integer', example: 1, nullable: true),
+                    new OA\Property(property: 'presion_arterial', type: 'string', example: '120/80', nullable: true),
+                    new OA\Property(property: 'temperatura', type: 'number', format: 'float', example: 36.6, nullable: true),
+                    new OA\Property(property: 'oxigeno_sangre', type: 'integer', example: 98, nullable: true),
                     new OA\Property(property: 'seguro', type: 'boolean', example: true),
                     new OA\Property(property: 'estado', type: 'string', example: 'Activo')
                 ]
@@ -172,11 +191,18 @@ class PacienteController extends Controller
             'fecha_nacimiento' => 'nullable|date',
             'telefono'         => 'nullable|string|max:255',
             'direccion'        => 'nullable|string|max:255',
+            'estatura'         => 'nullable|numeric|min:0|max:3',
+            'peso'             => 'nullable|numeric|min:0|max:999.99',
+            'tipo_sangre_id'   => 'nullable|exists:tipos_sangre,id',
+            'presion_arterial' => 'nullable|string|max:20',
+            'temperatura'      => 'nullable|numeric|min:30|max:45',
+            'oxigeno_sangre'   => 'nullable|integer|min:0|max:100',
             'seguro'           => 'required|boolean',
             'estado'           => 'required|string|max:255',
         ]);
 
         $paciente->update($validated);
+        $paciente->load('tipoSangre:id,nombre');
 
         return response()->json([
             'success' => true,
