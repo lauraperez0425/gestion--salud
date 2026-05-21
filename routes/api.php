@@ -5,6 +5,8 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CitaController;
 use App\Http\Controllers\Api\PacienteController;
 use App\Http\Controllers\Api\RoleController;
+use App\Http\Controllers\Api\HistoriaClinicaController;
+use App\Http\Controllers\Api\TipoSangreController;
 use App\Http\Controllers\Api\UserController;
 
 Route::post('/login', [AuthController::class, 'login']);
@@ -16,8 +18,19 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/roles', [RoleController::class, 'index']);
     Route::get('/medicos', [UserController::class, 'medicos']);
+    Route::get('/tipos-sangre', [TipoSangreController::class, 'index']);
 
     Route::apiResource('pacientes', PacienteController::class);
+    // Historias Clínicas
+    Route::get('/pacientes/{paciente_id}/historias-clinicas', [HistoriaClinicaController::class, 'porPaciente']);
+    Route::middleware('role:Medico,Administrador')->group(function () {
+        Route::get('/historias-clinicas', [HistoriaClinicaController::class, 'index']);
+        Route::post('/historias-clinicas', [HistoriaClinicaController::class, 'store']);
+        Route::get('/historias-clinicas/{id}', [HistoriaClinicaController::class, 'show']);
+        Route::put('/historias-clinicas/{id}', [HistoriaClinicaController::class, 'update']);
+        Route::delete('/historias-clinicas/{id}', [HistoriaClinicaController::class, 'destroy']);
+    });
+
     Route::get('/citas/disponibilidad', [CitaController::class, 'disponibilidad']);
     Route::get('/medicos/{medico_id}/citas', [CitaController::class, 'citasPorMedico']);
     Route::get('/pacientes/{paciente_id}/citas', [CitaController::class, 'citasPorPaciente']);

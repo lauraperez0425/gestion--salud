@@ -475,6 +475,338 @@
                 ]
             }
         },
+        "/api/historias-clinicas": {
+            "get": {
+                "tags": [
+                    "Historias Clínicas"
+                ],
+                "summary": "Listar todas las historias clínicas",
+                "operationId": "c0151d1e2abdce1ed6433c110adedbc3",
+                "parameters": [
+                    {
+                        "name": "paciente_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "fecha_desde",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "fecha_hasta",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista de historias clínicas"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Historias Clínicas"
+                ],
+                "summary": "Crear una historia clínica",
+                "operationId": "befe68b633beac0dd7209c65b7e3e880",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "paciente_id",
+                                    "motivo_consulta",
+                                    "enfermedad_actual",
+                                    "diagnostico",
+                                    "fecha"
+                                ],
+                                "properties": {
+                                    "paciente_id": {
+                                        "description": "ID del paciente",
+                                        "type": "integer"
+                                    },
+                                    "motivo_consulta": {
+                                        "description": "Motivo de consulta",
+                                        "type": "string"
+                                    },
+                                    "enfermedad_actual": {
+                                        "description": "Enfermedad actual / síntomas",
+                                        "type": "string"
+                                    },
+                                    "peso": {
+                                        "description": "Peso en kg (opcional)",
+                                        "type": "number",
+                                        "format": "float"
+                                    },
+                                    "talla": {
+                                        "description": "Talla en metros (opcional)",
+                                        "type": "number",
+                                        "format": "float"
+                                    },
+                                    "presion_arterial": {
+                                        "description": "Presión arterial, ej. 120/80 (opcional)",
+                                        "type": "string"
+                                    },
+                                    "saturacion": {
+                                        "description": "Saturación de oxígeno % (opcional)",
+                                        "type": "integer"
+                                    },
+                                    "temperatura": {
+                                        "description": "Temperatura corporal (opcional)",
+                                        "type": "number",
+                                        "format": "float"
+                                    },
+                                    "diagnostico": {
+                                        "description": "Diagnóstico",
+                                        "type": "string"
+                                    },
+                                    "tratamiento": {
+                                        "description": "Tratamiento indicado (opcional)",
+                                        "type": "string"
+                                    },
+                                    "observaciones": {
+                                        "description": "Observaciones adicionales (opcional)",
+                                        "type": "string"
+                                    },
+                                    "fecha": {
+                                        "description": "Fecha del registro (Y-m-d)",
+                                        "type": "string",
+                                        "format": "date"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Historia clínica creada"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "422": {
+                        "description": "Datos inválidos"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/historias-clinicas/{id}": {
+            "get": {
+                "tags": [
+                    "Historias Clínicas"
+                ],
+                "summary": "Ver una historia clínica",
+                "operationId": "4463a30d42a74c829fe8cb7a901718b1",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Historia clínica encontrada"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "404": {
+                        "description": "No encontrada"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Historias Clínicas"
+                ],
+                "summary": "Actualizar una historia clínica",
+                "operationId": "fd05a0f03efa49c6810c8ffb5e2832ad",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "motivo_consulta": {
+                                        "type": "string"
+                                    },
+                                    "enfermedad_actual": {
+                                        "type": "string"
+                                    },
+                                    "peso": {
+                                        "type": "number",
+                                        "format": "float"
+                                    },
+                                    "talla": {
+                                        "type": "number",
+                                        "format": "float"
+                                    },
+                                    "presion_arterial": {
+                                        "type": "string"
+                                    },
+                                    "saturacion": {
+                                        "type": "integer"
+                                    },
+                                    "temperatura": {
+                                        "type": "number",
+                                        "format": "float"
+                                    },
+                                    "diagnostico": {
+                                        "type": "string"
+                                    },
+                                    "tratamiento": {
+                                        "type": "string"
+                                    },
+                                    "observaciones": {
+                                        "type": "string"
+                                    },
+                                    "fecha": {
+                                        "type": "string",
+                                        "format": "date"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Historia clínica actualizada"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "404": {
+                        "description": "No encontrada"
+                    },
+                    "422": {
+                        "description": "Datos inválidos"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Historias Clínicas"
+                ],
+                "summary": "Eliminar una historia clínica",
+                "operationId": "8a4e85d1099ae6437ebd82ee57769429",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Historia clínica eliminada"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "404": {
+                        "description": "No encontrada"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/pacientes/{paciente_id}/historias-clinicas": {
+            "get": {
+                "tags": [
+                    "Historias Clínicas"
+                ],
+                "summary": "Listar historias clínicas de un paciente específico",
+                "operationId": "f86ad3855416672f11e677406b16dad4",
+                "parameters": [
+                    {
+                        "name": "paciente_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Historias clínicas del paciente"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "404": {
+                        "description": "Paciente no encontrado"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/api/pacientes": {
             "get": {
                 "tags": [
@@ -548,6 +880,39 @@
                                     "direccion": {
                                         "type": "string",
                                         "example": "Av. Principal 123"
+                                    },
+                                    "estatura": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 1.68,
+                                        "nullable": true
+                                    },
+                                    "peso": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 65.4,
+                                        "nullable": true
+                                    },
+                                    "tipo_sangre_id": {
+                                        "type": "integer",
+                                        "example": 1,
+                                        "nullable": true
+                                    },
+                                    "presion_arterial": {
+                                        "type": "string",
+                                        "example": "120/80",
+                                        "nullable": true
+                                    },
+                                    "temperatura": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 36.6,
+                                        "nullable": true
+                                    },
+                                    "oxigeno_sangre": {
+                                        "type": "integer",
+                                        "example": 98,
+                                        "nullable": true
                                     },
                                     "seguro": {
                                         "type": "boolean",
@@ -674,6 +1039,39 @@
                                     "direccion": {
                                         "type": "string",
                                         "example": "Av. Principal 123"
+                                    },
+                                    "estatura": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 1.68,
+                                        "nullable": true
+                                    },
+                                    "peso": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 65.4,
+                                        "nullable": true
+                                    },
+                                    "tipo_sangre_id": {
+                                        "type": "integer",
+                                        "example": 1,
+                                        "nullable": true
+                                    },
+                                    "presion_arterial": {
+                                        "type": "string",
+                                        "example": "120/80",
+                                        "nullable": true
+                                    },
+                                    "temperatura": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 36.6,
+                                        "nullable": true
+                                    },
+                                    "oxigeno_sangre": {
+                                        "type": "integer",
+                                        "example": 98,
+                                        "nullable": true
                                     },
                                     "seguro": {
                                         "type": "boolean",
@@ -935,6 +1333,28 @@
                     },
                     "404": {
                         "description": "No encontrado"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/tipos-sangre": {
+            "get": {
+                "tags": [
+                    "Pacientes"
+                ],
+                "summary": "Lista de tipos de sangre",
+                "operationId": "8f43fcc7c3f2a2bf68677408fa19e05b",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "401": {
+                        "description": "No autenticado"
                     }
                 },
                 "security": [
@@ -1218,6 +1638,10 @@
         {
             "name": "Citas",
             "description": "Citas"
+        },
+        {
+            "name": "Historias Clínicas",
+            "description": "Historias Clínicas"
         },
         {
             "name": "Pacientes",
