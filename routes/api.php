@@ -6,6 +6,8 @@ use App\Http\Controllers\Api\CitaController;
 use App\Http\Controllers\Api\PacienteController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\HistoriaClinicaController;
+use App\Http\Controllers\Api\MedicamentoController;
+use App\Http\Controllers\Api\MovimientoFarmaciaController;
 use App\Http\Controllers\Api\TipoSangreController;
 use App\Http\Controllers\Api\UserController;
 
@@ -19,6 +21,21 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/roles', [RoleController::class, 'index']);
     Route::get('/medicos', [UserController::class, 'medicos']);
     Route::get('/tipos-sangre', [TipoSangreController::class, 'index']);
+
+    // Farmacia - Medicamentos (cualquier autenticado puede consultar)
+    Route::get('/medicamentos', [MedicamentoController::class, 'index']);
+    Route::get('/medicamentos/{id}', [MedicamentoController::class, 'show']);
+    Route::get('/medicamentos/{medicamento_id}/movimientos', [MovimientoFarmaciaController::class, 'porMedicamento']);
+
+    // Farmacia - solo Médico y Administrador pueden gestionar
+    Route::middleware('role:Medico,Administrador')->group(function () {
+        Route::post('/medicamentos', [MedicamentoController::class, 'store']);
+        Route::put('/medicamentos/{id}', [MedicamentoController::class, 'update']);
+        Route::delete('/medicamentos/{id}', [MedicamentoController::class, 'destroy']);
+        Route::get('/movimientos-farmacia', [MovimientoFarmaciaController::class, 'index']);
+        Route::post('/movimientos-farmacia', [MovimientoFarmaciaController::class, 'store']);
+        Route::get('/movimientos-farmacia/{id}', [MovimientoFarmaciaController::class, 'show']);
+    });
 
     Route::apiResource('pacientes', PacienteController::class);
     // Historias Clínicas
