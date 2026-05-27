@@ -807,6 +807,441 @@
                 ]
             }
         },
+        "/api/medicamentos": {
+            "get": {
+                "tags": [
+                    "Farmacia"
+                ],
+                "summary": "Listar medicamentos",
+                "operationId": "042c826e1d62006827c7286eec208ec0",
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Buscar por nombre",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "estado",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "activo",
+                                "inactivo"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista de medicamentos"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Farmacia"
+                ],
+                "summary": "Registrar medicamento",
+                "operationId": "c99e7377d76695c8d2ba02c8265b8a4f",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "nombre"
+                                ],
+                                "properties": {
+                                    "nombre": {
+                                        "type": "string",
+                                        "example": "Paracetamol"
+                                    },
+                                    "descripcion": {
+                                        "type": "string",
+                                        "example": "Analgésico y antipirético",
+                                        "nullable": true
+                                    },
+                                    "stock": {
+                                        "type": "integer",
+                                        "example": 100
+                                    },
+                                    "precio": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 5.5,
+                                        "nullable": true
+                                    },
+                                    "estado": {
+                                        "type": "string",
+                                        "example": "activo",
+                                        "enum": [
+                                            "activo",
+                                            "inactivo"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Medicamento creado"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "422": {
+                        "description": "Datos inválidos"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/medicamentos/{id}": {
+            "get": {
+                "tags": [
+                    "Farmacia"
+                ],
+                "summary": "Detalle de medicamento",
+                "operationId": "ac9453f19ca75cfb0e05d257339a731e",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Medicamento encontrado"
+                    },
+                    "404": {
+                        "description": "No encontrado"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Farmacia"
+                ],
+                "summary": "Actualizar medicamento",
+                "operationId": "bce048962eba0316ba96ada156ddeb8b",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "nombre": {
+                                        "type": "string"
+                                    },
+                                    "descripcion": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "stock": {
+                                        "type": "integer"
+                                    },
+                                    "precio": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "nullable": true
+                                    },
+                                    "estado": {
+                                        "type": "string",
+                                        "enum": [
+                                            "activo",
+                                            "inactivo"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Medicamento actualizado"
+                    },
+                    "404": {
+                        "description": "No encontrado"
+                    },
+                    "422": {
+                        "description": "Datos inválidos"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Farmacia"
+                ],
+                "summary": "Eliminar medicamento",
+                "operationId": "651895717d62d3ac28d942b045145927",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Medicamento eliminado"
+                    },
+                    "404": {
+                        "description": "No encontrado"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/movimientos-farmacia": {
+            "get": {
+                "tags": [
+                    "Farmacia"
+                ],
+                "summary": "Listar movimientos de farmacia",
+                "operationId": "af2cc3fe9220493e54e87ea82e49f840",
+                "parameters": [
+                    {
+                        "name": "medicamento_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "tipo",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "entrada",
+                                "salida"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "fecha_desde",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "fecha_hasta",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista de movimientos"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Farmacia"
+                ],
+                "summary": "Registrar movimiento de farmacia (entrada o salida)",
+                "operationId": "4ed3362e27115b5854c727a205f7c8f4",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "medicamento_id",
+                                    "tipo",
+                                    "cantidad",
+                                    "fecha"
+                                ],
+                                "properties": {
+                                    "medicamento_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "tipo": {
+                                        "type": "string",
+                                        "example": "entrada",
+                                        "enum": [
+                                            "entrada",
+                                            "salida"
+                                        ]
+                                    },
+                                    "cantidad": {
+                                        "type": "integer",
+                                        "example": 50
+                                    },
+                                    "detalle": {
+                                        "type": "string",
+                                        "example": "Compra mensual",
+                                        "nullable": true
+                                    },
+                                    "fecha": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2026-05-20"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Movimiento registrado"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "409": {
+                        "description": "Stock insuficiente"
+                    },
+                    "422": {
+                        "description": "Datos inválidos"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/movimientos-farmacia/{id}": {
+            "get": {
+                "tags": [
+                    "Farmacia"
+                ],
+                "summary": "Detalle de movimiento de farmacia",
+                "operationId": "d6b93b5fcfb3ec57277e65c254bc08d6",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Movimiento encontrado"
+                    },
+                    "404": {
+                        "description": "No encontrado"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/medicamentos/{medicamento_id}/movimientos": {
+            "get": {
+                "tags": [
+                    "Farmacia"
+                ],
+                "summary": "Movimientos de un medicamento específico",
+                "operationId": "9ea235b7b9478c07355b5f5c9394bf88",
+                "parameters": [
+                    {
+                        "name": "medicamento_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Movimientos del medicamento"
+                    },
+                    "404": {
+                        "description": "Medicamento no encontrado"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/api/pacientes": {
             "get": {
                 "tags": [
@@ -1642,6 +2077,10 @@
         {
             "name": "Historias Clínicas",
             "description": "Historias Clínicas"
+        },
+        {
+            "name": "Farmacia",
+            "description": "Farmacia"
         },
         {
             "name": "Pacientes",
