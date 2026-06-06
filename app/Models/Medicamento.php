@@ -24,4 +24,10 @@ class Medicamento extends Model
     {
         return $this->hasMany(MovimientoFarmacia::class);
     }
+
+    // Un medicamento puede estar en varias recetas médicas
+    public function recetasMedicas()
+    {
+        return $this->hasMany(RecetaMedica::class);
+    }
 }

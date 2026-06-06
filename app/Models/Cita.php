@@ -30,4 +30,10 @@ class Cita extends Model
     {
         return $this->belongsTo(User::class, 'medico_id');
     }
+
+    // Una cita puede tener varias recetas médicas
+    public function recetasMedicas()
+    {
+        return $this->hasMany(RecetaMedica::class);
+    }
 }

@@ -13,6 +13,8 @@ class MovimientoFarmacia extends Model
 
     protected $fillable = [
         'medicamento_id',
+        'receta_medica_id',
+        'farmaceutico_id',
         'tipo',
         'cantidad',
         'detalle',
@@ -23,5 +25,15 @@ class MovimientoFarmacia extends Model
     public function medicamento()
     {
         return $this->belongsTo(Medicamento::class);
+    }
+
+    public function recetaMedica()
+    {
+        return $this->belongsTo(RecetaMedica::class);
+    }
+
+    public function farmaceutico()
+    {
+        return $this->belongsTo(User::class, 'farmaceutico_id');
     }
 }

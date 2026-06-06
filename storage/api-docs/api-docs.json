@@ -1063,6 +1063,22 @@
                         }
                     },
                     {
+                        "name": "receta_medica_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "farmaceutico_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
                         "name": "tipo",
                         "in": "query",
                         "required": false,
@@ -1128,6 +1144,16 @@
                                     "medicamento_id": {
                                         "type": "integer",
                                         "example": 1
+                                    },
+                                    "receta_medica_id": {
+                                        "type": "integer",
+                                        "example": 1,
+                                        "nullable": true
+                                    },
+                                    "farmaceutico_id": {
+                                        "type": "integer",
+                                        "example": 5,
+                                        "nullable": true
                                     },
                                     "tipo": {
                                         "type": "string",
@@ -1561,6 +1587,887 @@
                     },
                     "404": {
                         "description": "No encontrado"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/recetas-medicas": {
+            "get": {
+                "tags": [
+                    "Recetas Médicas"
+                ],
+                "summary": "Listar recetas médicas",
+                "operationId": "ac939d560f132a89dcb5fbc5144bf849",
+                "parameters": [
+                    {
+                        "name": "cita_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "medicamento_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "paciente_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "medico_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "estado_despacho",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "pendiente",
+                                "parcial",
+                                "despachada"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista de recetas médicas"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Recetas Médicas"
+                ],
+                "summary": "Registrar receta médica",
+                "operationId": "db89291c09abb24f6449731dd6d004c4",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "cita_id",
+                                    "medicamento_id"
+                                ],
+                                "properties": {
+                                    "cita_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "medicamento_id": {
+                                        "type": "integer",
+                                        "example": 2
+                                    },
+                                    "dosis": {
+                                        "type": "string",
+                                        "example": "500 mg",
+                                        "nullable": true
+                                    },
+                                    "frecuencia": {
+                                        "type": "string",
+                                        "example": "Cada 8 horas",
+                                        "nullable": true
+                                    },
+                                    "duracion": {
+                                        "type": "string",
+                                        "example": "7 dias",
+                                        "nullable": true
+                                    },
+                                    "indicaciones": {
+                                        "type": "string",
+                                        "example": "Tomar despues de las comidas",
+                                        "nullable": true
+                                    },
+                                    "estado_despacho": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "enum": [
+                                            "pendiente",
+                                            "parcial",
+                                            "despachada"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Receta médica creada"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "422": {
+                        "description": "Datos inválidos"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/recetas-medicas/{id}": {
+            "get": {
+                "tags": [
+                    "Recetas Médicas"
+                ],
+                "summary": "Detalle de receta médica",
+                "operationId": "3d9b00657cb0ac9250e3cb0030eab445",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Receta médica encontrada"
+                    },
+                    "404": {
+                        "description": "No encontrada"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Recetas Médicas"
+                ],
+                "summary": "Actualizar receta médica",
+                "operationId": "c3e4176b0be39474f129706cadb7f5a0",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "cita_id": {
+                                        "type": "integer"
+                                    },
+                                    "medicamento_id": {
+                                        "type": "integer"
+                                    },
+                                    "dosis": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "frecuencia": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "duracion": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "indicaciones": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "estado_despacho": {
+                                        "type": "string",
+                                        "enum": [
+                                            "pendiente",
+                                            "parcial",
+                                            "despachada"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Receta médica actualizada"
+                    },
+                    "404": {
+                        "description": "No encontrada"
+                    },
+                    "422": {
+                        "description": "Datos inválidos"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Recetas Médicas"
+                ],
+                "summary": "Eliminar receta médica",
+                "operationId": "2443aab3ec5b1614ecd3282c564537cd",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Receta médica eliminada"
+                    },
+                    "404": {
+                        "description": "No encontrada"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/pacientes/{paciente_id}/recetas-medicas": {
+            "get": {
+                "tags": [
+                    "Recetas Médicas"
+                ],
+                "summary": "Listar recetas médicas por paciente",
+                "operationId": "bba2122f3acc106fac9b8f89a58c496d",
+                "parameters": [
+                    {
+                        "name": "paciente_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista de recetas médicas del paciente"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/medicos/{medico_id}/recetas-medicas": {
+            "get": {
+                "tags": [
+                    "Recetas Médicas"
+                ],
+                "summary": "Listar recetas médicas por médico",
+                "operationId": "6a02c6f92259b6b937e02490acfe918b",
+                "parameters": [
+                    {
+                        "name": "medico_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista de recetas médicas del médico"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/reportes/pacientes-atendidos-por-medico": {
+            "get": {
+                "tags": [
+                    "Reportes"
+                ],
+                "summary": "Pacientes atendidos por medico",
+                "operationId": "0bf5dbbcf2a647011ce316572dcd0db8",
+                "parameters": [
+                    {
+                        "name": "medico_id",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "fecha_desde",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "fecha_hasta",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Reporte generado"
+                    },
+                    "422": {
+                        "description": "Datos invalidos"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/reportes/total-citas-por-medico": {
+            "get": {
+                "tags": [
+                    "Reportes"
+                ],
+                "summary": "Total de citas por medico en rango de fechas",
+                "operationId": "9fa2fd3b4b5ab2894430e4e74df68b14",
+                "parameters": [
+                    {
+                        "name": "medico_id",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "fecha_desde",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "fecha_hasta",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Reporte generado"
+                    },
+                    "422": {
+                        "description": "Datos invalidos"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/reportes/tasa-cancelacion-por-medico": {
+            "get": {
+                "tags": [
+                    "Reportes"
+                ],
+                "summary": "Tasa de cancelacion de citas por medico",
+                "operationId": "2080852d3d49c2998e6d8c0ac2e0ba9d",
+                "parameters": [
+                    {
+                        "name": "medico_id",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "fecha_desde",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "fecha_hasta",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Reporte generado"
+                    },
+                    "422": {
+                        "description": "Datos invalidos"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/reportes/recetas-emitidas-por-medico": {
+            "get": {
+                "tags": [
+                    "Reportes"
+                ],
+                "summary": "Recetas emitidas por medico",
+                "operationId": "4d3536afa52bd6cb14b451c63cad662e",
+                "parameters": [
+                    {
+                        "name": "medico_id",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "fecha_desde",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "fecha_hasta",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Reporte generado"
+                    },
+                    "422": {
+                        "description": "Datos invalidos"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/reportes/recetas-por-paciente-historico": {
+            "get": {
+                "tags": [
+                    "Reportes"
+                ],
+                "summary": "Recetas por paciente historico",
+                "operationId": "70c5b188db911b45db5a5d9615378a8f",
+                "parameters": [
+                    {
+                        "name": "paciente_id",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "fecha_desde",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "fecha_hasta",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Reporte generado"
+                    },
+                    "422": {
+                        "description": "Datos invalidos"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/reportes/balance-recetas-estado-despacho": {
+            "get": {
+                "tags": [
+                    "Reportes"
+                ],
+                "summary": "Balance de recetas por estado de despacho",
+                "operationId": "63664d32ed8b1869d858972fffccff01",
+                "parameters": [
+                    {
+                        "name": "fecha_desde",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "fecha_hasta",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Reporte generado"
+                    },
+                    "422": {
+                        "description": "Datos invalidos"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/reportes/recetas-despachadas-por-farmaceutico": {
+            "get": {
+                "tags": [
+                    "Reportes"
+                ],
+                "summary": "Recetas despachadas por farmaceutico",
+                "operationId": "2edb2c2b608d3979dd3406119cb23795",
+                "parameters": [
+                    {
+                        "name": "farmaceutico_id",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "fecha_desde",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "fecha_hasta",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Reporte generado"
+                    },
+                    "422": {
+                        "description": "Datos invalidos"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/reportes/medicamentos-mas-prescritos-por-medico": {
+            "get": {
+                "tags": [
+                    "Reportes"
+                ],
+                "summary": "Medicamentos mas prescritos por medico",
+                "operationId": "35c4775045eba277b62343c6aa9ef1cb",
+                "parameters": [
+                    {
+                        "name": "medico_id",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "top",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    },
+                    {
+                        "name": "fecha_desde",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "fecha_hasta",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Reporte generado"
+                    },
+                    "422": {
+                        "description": "Datos invalidos"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/reportes/medicamentos-mas-prescritos-por-periodo": {
+            "get": {
+                "tags": [
+                    "Reportes"
+                ],
+                "summary": "Medicamentos mas prescritos por periodo",
+                "operationId": "1d27f94c8d3e50ccd7b7328735d3d1af",
+                "parameters": [
+                    {
+                        "name": "fecha_desde",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "fecha_hasta",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "top",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Reporte generado"
+                    },
+                    "422": {
+                        "description": "Datos invalidos"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/reportes/alertas-medicamentos-stock-bajo": {
+            "get": {
+                "tags": [
+                    "Reportes"
+                ],
+                "summary": "Alertas de medicamentos con stock bajo",
+                "operationId": "e5663b74417d73866bf342c5fa50455d",
+                "parameters": [
+                    {
+                        "name": "umbral",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Reporte generado"
+                    },
+                    "422": {
+                        "description": "Datos invalidos"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/reportes/productividad-medica": {
+            "get": {
+                "tags": [
+                    "Reportes"
+                ],
+                "summary": "Productividad medica (citas completadas + recetas emitidas)",
+                "operationId": "31c71804bbc11875027723026f5fd35c",
+                "parameters": [
+                    {
+                        "name": "medico_id",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "fecha_desde",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "fecha_hasta",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Reporte generado"
+                    },
+                    "422": {
+                        "description": "Datos invalidos"
                     }
                 },
                 "security": [
@@ -2085,6 +2992,14 @@
         {
             "name": "Pacientes",
             "description": "Pacientes"
+        },
+        {
+            "name": "Recetas Médicas",
+            "description": "Recetas Médicas"
+        },
+        {
+            "name": "Reportes",
+            "description": "Reportes"
         },
         {
             "name": "Roles",

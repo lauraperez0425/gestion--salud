@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Medicamento;
 use App\Models\MovimientoFarmacia;
+use App\Models\RecetaMedica;
 use Illuminate\Http\Request;
 use OpenApi\Attributes as OA;
 
@@ -17,6 +18,8 @@ class MovimientoFarmaciaController extends Controller
         security: [['sanctum' => []]],
         parameters: [
             new OA\Parameter(name: 'medicamento_id', in: 'query', required: false, schema: new OA\Schema(type: 'integer')),
+            new OA\Parameter(name: 'receta_medica_id', in: 'query', required: false, schema: new OA\Schema(type: 'integer')),
+            new OA\Parameter(name: 'farmaceutico_id', in: 'query', required: false, schema: new OA\Schema(type: 'integer')),
             new OA\Parameter(name: 'tipo', in: 'query', required: false, schema: new OA\Schema(type: 'string', enum: ['entrada', 'salida'])),
             new OA\Parameter(name: 'fecha_desde', in: 'query', required: false, schema: new OA\Schema(type: 'string', format: 'date')),
             new OA\Parameter(name: 'fecha_hasta', in: 'query', required: false, schema: new OA\Schema(type: 'string', format: 'date')),
@@ -28,12 +31,24 @@ class MovimientoFarmaciaController extends Controller
     )]
     public function index(Request $request)
     {
-        $query = MovimientoFarmacia::with('medicamento:id,nombre,stock,precio')
+        $query = MovimientoFarmacia::with([
+            'medicamento:id,nombre,stock,precio',
+            'recetaMedica:id,cita_id,medicamento_id,estado_despacho',
+            'farmaceutico:id,name,email',
+        ])
             ->orderByDesc('fecha')
             ->orderByDesc('id');
 
         if ($request->filled('medicamento_id')) {
             $query->where('medicamento_id', $request->integer('medicamento_id'));
+        }
+
+        if ($request->filled('receta_medica_id')) {
+            $query->where('receta_medica_id', $request->integer('receta_medica_id'));
+        }
+
+        if ($request->filled('farmaceutico_id')) {
+            $query->where('farmaceutico_id', $request->integer('farmaceutico_id'));
         }
 
         if ($request->filled('tipo')) {
@@ -66,6 +81,8 @@ class MovimientoFarmaciaController extends Controller
                 required: ['medicamento_id', 'tipo', 'cantidad', 'fecha'],
                 properties: [
                     new OA\Property(property: 'medicamento_id', type: 'integer', example: 1),
+                    new OA\Property(property: 'receta_medica_id', type: 'integer', example: 1, nullable: true),
+                    new OA\Property(property: 'farmaceutico_id', type: 'integer', example: 5, nullable: true),
                     new OA\Property(property: 'tipo', type: 'string', enum: ['entrada', 'salida'], example: 'entrada'),
                     new OA\Property(property: 'cantidad', type: 'integer', example: 50),
                     new OA\Property(property: 'detalle', type: 'string', example: 'Compra mensual', nullable: true),
@@ -84,11 +101,35 @@ class MovimientoFarmaciaController extends Controller
     {
         $validated = $request->validate([
             'medicamento_id' => 'required|exists:medicamentos,id',
+            'receta_medica_id' => 'nullable|exists:recetas_medicas,id',
+            'farmaceutico_id' => 'nullable|exists:users,id',
             'tipo'           => 'required|in:entrada,salida',
             'cantidad'       => 'required|integer|min:1',
             'detalle'        => 'nullable|string',
             'fecha'          => 'required|date_format:Y-m-d',
         ]);
+
+        if (!isset($validated['farmaceutico_id']) && $request->user()) {
+            $validated['farmaceutico_id'] = $request->user()->id;
+        }
+
+        if (!empty($validated['receta_medica_id'])) {
+            $receta = RecetaMedica::find($validated['receta_medica_id']);
+
+            if (!$receta) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Receta médica no encontrada',
+                ], 422);
+            }
+
+            if ((int) $receta->medicamento_id !== (int) $validated['medicamento_id']) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'La receta médica no corresponde al medicamento seleccionado',
+                ], 422);
+            }
+        }
 
         $medicamento = Medicamento::find($validated['medicamento_id']);
 
@@ -108,7 +149,17 @@ class MovimientoFarmaciaController extends Controller
             $medicamento->decrement('stock', $validated['cantidad']);
         }
 
-        $movimiento->load('medicamento:id,nombre,stock,precio');
+        if (!empty($validated['receta_medica_id']) && $validated['tipo'] === 'salida') {
+            RecetaMedica::where('id', $validated['receta_medica_id'])->update([
+                'estado_despacho' => 'despachada',
+            ]);
+        }
+
+        $movimiento->load([
+            'medicamento:id,nombre,stock,precio',
+            'recetaMedica:id,cita_id,medicamento_id,estado_despacho',
+            'farmaceutico:id,name,email',
+        ]);
 
         return response()->json([
             'success' => true,
@@ -132,7 +183,11 @@ class MovimientoFarmaciaController extends Controller
     )]
     public function show(int $id)
     {
-        $movimiento = MovimientoFarmacia::with('medicamento:id,nombre,stock,precio')->find($id);
+        $movimiento = MovimientoFarmacia::with([
+            'medicamento:id,nombre,stock,precio',
+            'recetaMedica:id,cita_id,medicamento_id,estado_despacho',
+            'farmaceutico:id,name,email',
+        ])->find($id);
 
         if (!$movimiento) {
             return response()->json([
@@ -173,6 +228,10 @@ class MovimientoFarmaciaController extends Controller
         }
 
         $movimientos = MovimientoFarmacia::where('medicamento_id', $medicamento_id)
+            ->with([
+                'recetaMedica:id,cita_id,medicamento_id,estado_despacho',
+                'farmaceutico:id,name,email',
+            ])
             ->orderByDesc('fecha')
             ->orderByDesc('id')
             ->get();
