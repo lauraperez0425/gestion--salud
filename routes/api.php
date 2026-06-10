@@ -30,7 +30,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/medicamentos/{medicamento_id}/movimientos', [MovimientoFarmaciaController::class, 'porMedicamento']);
 
     // Farmacia - solo Médico y Administrador pueden gestionar
-    Route::middleware('role:Medico,Administrador')->group(function () {
+    Route::middleware('role:Medico,Administrador,Farmaceutico')->group(function () {
         Route::post('/medicamentos', [MedicamentoController::class, 'store']);
         Route::put('/medicamentos/{id}', [MedicamentoController::class, 'update']);
         Route::delete('/medicamentos/{id}', [MedicamentoController::class, 'destroy']);
@@ -64,7 +64,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/pacientes/{paciente_id}/recetas-medicas', [RecetaMedicaController::class, 'porPaciente']);
     
     // Solo médico y administrador pueden listar TODAS las citas
-    Route::middleware('role:Medico,Administrador')->group(function () {
+    Route::middleware('role:Medico,Administrador,Soporte')->group(function () {
         Route::get('/citas', [CitaController::class, 'index']);
     });
     
@@ -74,8 +74,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/citas/{id}', [CitaController::class, 'update']);
     Route::delete('/citas/{id}', [CitaController::class, 'destroy']);
 
-    Route::middleware('role:Administrador')->group(function () {
+    Route::middleware('role:Administrador,Soporte')->group(function () {
         Route::apiResource('users', UserController::class);
+    });
+
+    Route::middleware('role:Administrador')->group(function () {
         Route::post('/roles', [RoleController::class, 'store']);
         Route::get('/roles/{id}', [RoleController::class, 'show']);
         Route::put('/roles/{id}', [RoleController::class, 'update']);
