@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\SecurityLog;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -88,14 +89,24 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:users,email',
+            'name'   => 'required|string|max:255',
+            'email'  => 'required|email|max:255|unique:users,email',
             'password' => 'required|string|min:6',
             'rol_id' => 'required|exists:roles,id',
         ]);
 
         $user = User::create($validated);
         $user->load('role');
+
+        SecurityLog::create([
+            'user_id'     => $request->user()->id,
+            'tipo_evento' => 'usuario_creado',
+            'ip'          => $request->ip(),
+            'user_agent'  => $request->userAgent(),
+            'endpoint'    => $request->path(),
+            'metodo'      => $request->method(),
+            'descripcion' => 'Usuario creado: ' . $user->email . ' (rol: ' . $user->role->nombre . ') por ' . $request->user()->email,
+        ]);
 
         return response()->json([
             'success' => true,
@@ -177,14 +188,12 @@ class UserController extends Controller
         }
 
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => [
-                'required',
-                'email',
-                'max:255',
+            'name'   => 'required|string|max:255',
+            'email'  => [
+                'required', 'email', 'max:255',
                 Rule::unique('users', 'email')->ignore($user->id),
             ],
-            'rol_id' => 'required|exists:roles,id',
+            'rol_id'   => 'required|exists:roles,id',
             'password' => 'nullable|string|min:6',
         ]);
 
@@ -194,6 +203,16 @@ class UserController extends Controller
 
         $user->update($validated);
         $user->load('role');
+
+        SecurityLog::create([
+            'user_id'     => $request->user()->id,
+            'tipo_evento' => 'usuario_actualizado',
+            'ip'          => $request->ip(),
+            'user_agent'  => $request->userAgent(),
+            'endpoint'    => $request->path(),
+            'metodo'      => $request->method(),
+            'descripcion' => 'Usuario actualizado: ' . $user->email . ' por ' . $request->user()->email,
+        ]);
 
         return response()->json([
             'success' => true,
@@ -217,7 +236,7 @@ class UserController extends Controller
             new OA\Response(response: 404, description: 'No encontrado')
         ]
     )]
-    public function destroy(string $id)
+    public function destroy(Request $request, string $id)
     {
         $user = User::find($id);
 
@@ -227,6 +246,16 @@ class UserController extends Controller
                 'message' => 'Usuario no encontrado'
             ], 404);
         }
+
+        SecurityLog::create([
+            'user_id'     => $request->user()->id,
+            'tipo_evento' => 'usuario_eliminado',
+            'ip'          => $request->ip(),
+            'user_agent'  => $request->userAgent(),
+            'endpoint'    => $request->path(),
+            'metodo'      => $request->method(),
+            'descripcion' => 'Usuario eliminado: ' . $user->email . ' por ' . $request->user()->email,
+        ]);
 
         $user->delete();
 
