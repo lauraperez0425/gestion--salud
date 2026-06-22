@@ -807,6 +807,96 @@
                 ]
             }
         },
+        "/api/logs/seguridad": {
+            "get": {
+                "tags": [
+                    "Logs"
+                ],
+                "summary": "Listar logs de seguridad",
+                "operationId": "298a372ccd26cab6e06219994bbafd3a",
+                "parameters": [
+                    {
+                        "name": "tipo_evento",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "login_exitoso",
+                                "login_fallido",
+                                "logout",
+                                "acceso_denegado",
+                                "cambio_password_exitoso",
+                                "cambio_password_fallido"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "user_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "fecha_desde",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date",
+                            "example": "2026-01-01"
+                        }
+                    },
+                    {
+                        "name": "fecha_hasta",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date",
+                            "example": "2026-12-31"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista de logs de seguridad"
+                    },
+                    "403": {
+                        "description": "No autorizado"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/logs/aplicacion": {
+            "get": {
+                "tags": [
+                    "Logs"
+                ],
+                "summary": "Listar logs de aplicación (últimas 100 líneas)",
+                "operationId": "8523cd2a8a51d75de26eccb057fedeba",
+                "responses": {
+                    "200": {
+                        "description": "Líneas del log de Laravel"
+                    },
+                    "403": {
+                        "description": "No autorizado"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/api/medicamentos": {
             "get": {
                 "tags": [
@@ -2984,6 +3074,10 @@
         {
             "name": "Historias Clínicas",
             "description": "Historias Clínicas"
+        },
+        {
+            "name": "Logs",
+            "description": "Logs"
         },
         {
             "name": "Farmacia",

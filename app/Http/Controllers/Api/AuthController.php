@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\SecurityLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -47,6 +48,17 @@ class AuthController extends Controller
         );
 
         if (!Auth::attempt($credentials)) {
+            // Log login fallido
+            SecurityLog::create([
+                'user_id'     => null,
+                'tipo_evento' => 'login_fallido',
+                'ip'          => $request->ip(),
+                'user_agent'  => $request->userAgent(),
+                'endpoint'    => $request->path(),
+                'metodo'      => $request->method(),
+                'descripcion' => 'Intento de login fallido para: ' . $request->email,
+            ]);
+
             return response()->json([
                 'success' => false,
                 'message' => 'Credenciales incorrectas'
@@ -55,6 +67,17 @@ class AuthController extends Controller
 
         $user = Auth::user()->load('role');
         $token = $user->createToken('auth_token')->plainTextToken;
+
+        // Log login exitoso
+        SecurityLog::create([
+            'user_id'     => $user->id,
+            'tipo_evento' => 'login_exitoso',
+            'ip'          => $request->ip(),
+            'user_agent'  => $request->userAgent(),
+            'endpoint'    => $request->path(),
+            'metodo'      => $request->method(),
+            'descripcion' => 'Login exitoso: ' . $user->email,
+        ]);
 
         return response()->json([
             'success' => true,
@@ -114,6 +137,17 @@ class AuthController extends Controller
             ], 401);
         }
 
+        // Log logout
+        SecurityLog::create([
+            'user_id'     => $user->id,
+            'tipo_evento' => 'logout',
+            'ip'          => $request->ip(),
+            'user_agent'  => $request->userAgent(),
+            'endpoint'    => $request->path(),
+            'metodo'      => $request->method(),
+            'descripcion' => 'Logout: ' . $user->email,
+        ]);
+
         $token->delete();
 
         return response()->json([
@@ -171,6 +205,17 @@ class AuthController extends Controller
         $validated = $validator->validated();
 
         if (!Hash::check($validated['current_password'], $user->password)) {
+            // Log cambio de contraseña fallido
+            SecurityLog::create([
+                'user_id'     => $user->id,
+                'tipo_evento' => 'cambio_password_fallido',
+                'ip'          => $request->ip(),
+                'user_agent'  => $request->userAgent(),
+                'endpoint'    => $request->path(),
+                'metodo'      => $request->method(),
+                'descripcion' => 'Intento fallido de cambio de contraseña: ' . $user->email,
+            ]);
+
             return response()->json([
                 'success' => false,
                 'message' => 'La contraseña actual es incorrecta'
@@ -179,6 +224,17 @@ class AuthController extends Controller
 
         $user->update([
             'password' => $validated['new_password']
+        ]);
+
+        // Log cambio de contraseña exitoso
+        SecurityLog::create([
+            'user_id'     => $user->id,
+            'tipo_evento' => 'cambio_password_exitoso',
+            'ip'          => $request->ip(),
+            'user_agent'  => $request->userAgent(),
+            'endpoint'    => $request->path(),
+            'metodo'      => $request->method(),
+            'descripcion' => 'Cambio de contraseña exitoso: ' . $user->email,
         ]);
 
         return response()->json([

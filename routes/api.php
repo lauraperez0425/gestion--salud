@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\MedicamentoController;
 use App\Http\Controllers\Api\MovimientoFarmaciaController;
 use App\Http\Controllers\Api\TipoSangreController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\LogController;
 
 Route::post('/login', [AuthController::class, 'login']);
 
@@ -79,10 +80,14 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::middleware('role:Administrador')->group(function () {
-        Route::post('/roles', [RoleController::class, 'store']);
-        Route::get('/roles/{id}', [RoleController::class, 'show']);
-        Route::put('/roles/{id}', [RoleController::class, 'update']);
-        Route::delete('/roles/{id}', [RoleController::class, 'destroy']);
+    Route::post('/roles', [RoleController::class, 'store']);
+    Route::get('/roles/{id}', [RoleController::class, 'show']);
+    Route::put('/roles/{id}', [RoleController::class, 'update']);
+    Route::delete('/roles/{id}', [RoleController::class, 'destroy']);
+
+    // Logs
+    Route::get('/logs/seguridad', [LogController::class, 'logsSeguridad']);
+    Route::get('/logs/aplicacion', [LogController::class, 'logsAplicacion']);
     });
 
     Route::middleware('role:Medico,Administrador')->prefix('reportes')->group(function () {
@@ -98,4 +103,5 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/alertas-medicamentos-stock-bajo', [ReporteController::class, 'alertasMedicamentosStockBajo']);
         Route::get('/productividad-medica', [ReporteController::class, 'productividadMedica']);
     });
+    
 });
